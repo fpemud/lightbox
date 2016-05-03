@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PYTHON_FILES="./virt-player"
+PYTHON_FILES="./lightbox"
 PYTHON_FILES="${PYTHON_FILES} $(find ./lib -name '*.py' | tr '\n' ' ')"
 ERRFLAG=0
 
