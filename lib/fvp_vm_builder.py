@@ -46,9 +46,6 @@ class FvpVmBuilder:
             if plugin is None:
                 raise Exception("the specified operating system is not supported")
 
-            # get os type
-            os_type = eval("FvpVmObject.%s" % (plugin.os_get_type(os_name)))
-
             # start build thread
             self.thread = _BuildThread()
             self.thread.dstdir = dstdir
@@ -57,7 +54,7 @@ class FvpVmBuilder:
             self.thread.os_name = os_name
             self.thread.params = params
             self.thread.plugin = plugin
-            self.thread.os_type = os_type
+            self.thread.os_type = eval("FvpVmObject.%s" % (plugin.os_get_type(os_name)))
             self.thread.r_pipe, self.thread.w_pipe = os.pipe()
             self.thread.start()
 
@@ -106,7 +103,7 @@ class _BuildThread(threading.Thread):
 
             # create main disk
             with open(os.path.join(self.dstdir, "disk-main.img"), 'wb') as f:
-                f.truncate(self._getMainDiskSizeByOs(self.os_type) * 1024 * 1024)
+                f.truncate(self._getMainDiskSizeByOs(self.os_type) * 1000 * 1000)
 
             if self.stop:
                 return
@@ -123,12 +120,12 @@ class _BuildThread(threading.Thread):
 
     def _getMainDiskSizeByOs(self, os_type):
         if os_type == FvpVmObject.OS_MSWINXP_X86:
-            return 10240                                    # 10GB
+            return 10000                                    # 10GB
         elif os_type == FvpVmObject.OS_MSWIN7_X86:
-            return 20480                                    # 20GB
+            return 20000                                    # 20GB
         elif os_type == FvpVmObject.OS_MSWIN7_AMD64:
-            return 20480                                    # 20GB
+            return 20000                                    # 20GB
         elif os_type == FvpVmObject.OS_GENTOO_LINUX_X86:
-            return 10240                                    # 10GB
+            return 10000                                    # 10GB
         else:
             assert False
