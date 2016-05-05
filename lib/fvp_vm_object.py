@@ -18,178 +18,41 @@ from fvp_util import FvpUtil
 
 class FvpVmConfig:
 
-    class HardwareInfo:
-        qemuVmType = None                            # str        "pc", "q35"
-        cpuArch = None                                # str
-        cpuNumber = None                            # int
-        memorySize = None                            # int        unit: MB
-        mainDiskInterface = None                    # str        "virtio-blk" => "ide", '=>' means 'can fallback to'
-        mainDiskFormat = None                        # str        "raw-sparse" => "qcow2"
-        mainDiskSize = None                            # int        unit: MB
-        graphicsAdapterInterface = None                # str        "qxl" => "vga"
-        graphicsAdapterPciSlot = None                # int
-        soundAdapterInterface = None                # str        "ac97" => ""
-        soundAdapterPciSlot = None                    # int
-        networkAdapterInterface = None                # str        "virtio" => "user" => ""
-        networkAdapterPciSlot = None                # int
-        balloonDeviceSupport = None                    # bool
-        balloonDevicePciSlot = None                    # int
-        vdiPortDeviceSupport = None                    # bool
-        vdiPortDevicePciSlot = None                    # int
-        shareDirectoryNumber = None                    # int
-        shareDirectoryHotplugSupport = None            # bool
-        shareUsbNumber = None                        # int
-        shareUsbHotplugSupport = None                # bool
-        shareScsiNumber = None                        # int
-        shareScsiHotplugSupport = None                # bool
-
-    hwInfo = HardwareInfo()
-
-    def checkValid(self):
-        """if FvmConfigHardware object is invalid, raise exception"""
-
-        validQemuVmType = ["pc", "q35"]
-        validArch = ["x86", "amd64"]
-        validDiskInterface = ["virtio-blk", "ide"]
-        validDiskFormat = ["raw-sparse", "qcow2"]
-        validGraphicsAdapterInterface = ["qxl", "vga"]
-        validSoundAdapterInterface = ["ac97", ""]
-        validNetworkAdapterInterface = ["virtio", "user", ""]
-
-        if self.hwInfo.qemuVmType is None or not isinstance(self.hwInfo.qemuVmType, str):
-            raise Exception("qemuVmType is invalid")
-        if self.hwInfo.qemuVmType not in validQemuVmType:
-            raise Exception("qemuVmType is invalid")
-
-        if self.hwInfo.cpuArch is None or not isinstance(self.hwInfo.cpuArch, str):
-            raise Exception("cpuArch is invalid")
-        if self.hwInfo.cpuArch not in validArch:
-            raise Exception("cpuArch is invalid")
-
-        if self.hwInfo.cpuNumber is None or not isinstance(self.hwInfo.cpuNumber, int):
-            raise Exception("cpuNumber is invalid")
-        if self.hwInfo.cpuNumber <= 0:
-            raise Exception("cpuNumber is invalid")
-
-        if self.hwInfo.memorySize is None or not isinstance(self.hwInfo.memorySize, int):
-            raise Exception("memorySize is invalid")
-        if self.hwInfo.memorySize <= 0:
-            raise Exception("memorySize is invalid")
-
-        if self.hwInfo.mainDiskInterface is None or not isinstance(self.hwInfo.mainDiskInterface, str):
-            raise Exception("mainDiskInterface is invalid")
-        if self.hwInfo.mainDiskInterface not in validDiskInterface:
-            raise Exception("mainDiskInterface is invalid")
-
-        if self.hwInfo.mainDiskFormat is None or not isinstance(self.hwInfo.mainDiskFormat, str):
-            raise Exception("mainDiskFormat is invalid")
-        if self.hwInfo.mainDiskFormat not in validDiskFormat:
-            raise Exception("mainDiskFormat is invalid")
-
-        if self.hwInfo.mainDiskSize is None or not isinstance(self.hwInfo.mainDiskSize, int):
-            raise Exception("mainDiskSize is invalid")
-        if self.hwInfo.mainDiskSize <= 0:
-            raise Exception("mainDiskSize is invalid")
-
-        if self.hwInfo.graphicsAdapterInterface is None or not isinstance(self.hwInfo.graphicsAdapterInterface, str):
-            raise Exception("graphicsAdapterInterface is invalid")
-        if self.hwInfo.graphicsAdapterInterface not in validGraphicsAdapterInterface:
-            raise Exception("graphicsAdapterInterface is invalid")
-
-        if self.hwInfo.graphicsAdapterPciSlot is None or not isinstance(self.hwInfo.graphicsAdapterPciSlot, int):
-            raise Exception("graphicsAdapterPciSlot is invalid")
-
-        if self.hwInfo.soundAdapterInterface is None or not isinstance(self.hwInfo.soundAdapterInterface, str):
-            raise Exception("soundAdapterInterface is invalid")
-        if self.hwInfo.soundAdapterInterface not in validSoundAdapterInterface:
-            raise Exception("soundAdapterInterface is invalid")
-
-        if self.hwInfo.soundAdapterInterface != "":
-            if self.hwInfo.soundAdapterPciSlot is None or not isinstance(self.hwInfo.soundAdapterPciSlot, int):
-                raise Exception("soundAdapterPciSlot is invalid")
-
-        if self.hwInfo.networkAdapterInterface is None or not isinstance(self.hwInfo.networkAdapterInterface, str):
-            raise Exception("networkAdapterInterface is invalid")
-        if self.hwInfo.networkAdapterInterface not in validNetworkAdapterInterface:
-            raise Exception("networkAdapterInterface is invalid")
-
-        if self.hwInfo.networkAdapterInterface != "":
-            if self.hwInfo.networkAdapterPciSlot is None or not isinstance(self.hwInfo.networkAdapterPciSlot, int):
-                raise Exception("networkAdapterPciSlot is invalid")
-
-        if self.hwInfo.balloonDeviceSupport is None or not isinstance(self.hwInfo.balloonDeviceSupport, bool):
-            raise Exception("balloonDeviceSupport is invalid")
-
-        if self.hwInfo.balloonDeviceSupport:
-            if self.hwInfo.balloonDevicePciSlot is None or not isinstance(self.hwInfo.balloonDevicePciSlot, int):
-                raise Exception("balloonDevicePciSlot is invalid")
-
-        if self.hwInfo.vdiPortDeviceSupport is None or not isinstance(self.hwInfo.vdiPortDeviceSupport, bool):
-            raise Exception("vdiPortDeviceSupport is invalid")
-
-        if self.hwInfo.vdiPortDeviceSupport:
-            if self.hwInfo.vdiPortDevicePciSlot is None or not isinstance(self.hwInfo.vdiPortDevicePciSlot, int):
-                raise Exception("vdiPortDevicePciSlot is invalid")
-
-        if self.hwInfo.shareDirectoryNumber is None or not isinstance(self.hwInfo.shareDirectoryNumber, int):
-            raise Exception("shareDirectoryNumber is invalid")
-        if self.hwInfo.shareDirectoryNumber < 0:
-            raise Exception("shareDirectoryNumber is invalid")
-
-        if self.hwInfo.shareDirectoryHotplugSupport is None or not isinstance(self.hwInfo.shareDirectoryHotplugSupport, bool):
-            raise Exception("shareDirectoryHotplugSupport is invalid")
-
-        if self.hwInfo.shareUsbNumber is None or not isinstance(self.hwInfo.shareUsbNumber, int):
-            raise Exception("shareUsbNumber is invalid")
-        if self.hwInfo.shareUsbNumber < 0:
-            raise Exception("shareUsbNumber is invalid")
-
-        if self.hwInfo.shareUsbHotplugSupport is None or not isinstance(self.hwInfo.shareUsbHotplugSupport, bool):
-            raise Exception("shareUsbHotplugSupport is invalid")
-
-        if self.hwInfo.shareScsiNumber is None or not isinstance(self.hwInfo.shareScsiNumber, int):
-            raise Exception("shareScsiNumber is invalid")
-        if self.hwInfo.shareScsiNumber < 0:
-            raise Exception("shareScsiNumber is invalid")
-
-        if self.hwInfo.shareScsiHotplugSupport is None or not isinstance(self.hwInfo.shareScsiHotplugSupport, bool):
-            raise Exception("shareScsiHotplugSupport is invalid")
-
-    def readFromDisk(self, vmDir):
-        """read object from disk"""
-
-        cfg = configparser.SafeConfigParser()
-        cfg.read(os.path.join(vmDir, "fqemu.hw"))
-
-        self.hwInfo.qemuVmType = cfg.get("hardware", "qemuVmType")
-        self.hwInfo.cpuArch = cfg.get("hardware", "cpuArch")
-        self.hwInfo.cpuNumber = cfg.getint("hardware", "cpuNumber")
-        self.hwInfo.memorySize = cfg.getint("hardware", "memorySize")
-        self.hwInfo.mainDiskInterface = cfg.get("hardware", "mainDiskInterface")
-        self.hwInfo.mainDiskFormat = cfg.get("hardware", "mainDiskFormat")
-        self.hwInfo.mainDiskSize = cfg.getint("hardware", "mainDiskSize")
-        self.hwInfo.graphicsAdapterInterface = cfg.get("hardware", "graphicsAdapterInterface")
-        self.hwInfo.graphicsAdapterPciSlot = cfg.getint("hardware", "graphicsAdapterPciSlot")
-        self.hwInfo.soundAdapterInterface = cfg.get("hardware", "soundAdapterInterface")
-        self.hwInfo.soundAdapterPciSlot = cfg.getint("hardware", "soundAdapterPciSlot")
-        self.hwInfo.networkAdapterInterface = cfg.get("hardware", "networkAdapterInterface")
-        self.hwInfo.networkAdapterPciSlot = cfg.getint("hardware", "networkAdapterPciSlot")
-        self.hwInfo.balloonDeviceSupport = cfg.getboolean("hardware", "balloonDeviceSupport")
-        self.hwInfo.balloonDevicePciSlot = cfg.getint("hardware", "balloonDevicePciSlot")
-        self.hwInfo.vdiPortDeviceSupport = cfg.getboolean("hardware", "vdiPortDeviceSupport")
-        self.hwInfo.vdiPortDevicePciSlot = cfg.getint("hardware", "vdiPortDevicePciSlot")
-        self.hwInfo.shareDirectoryNumber = cfg.getint("hardware", "shareDirectoryNumber")
-        self.hwInfo.shareDirectoryHotplugSupport = cfg.getboolean("hardware", "shareDirectoryHotplugSupport")
-        self.hwInfo.shareUsbNumber = cfg.getint("hardware", "shareUsbNumber")
-        self.hwInfo.shareUsbHotplugSupport = cfg.getboolean("hardware", "shareUsbHotplugSupport")
-        self.hwInfo.shareScsiNumber = cfg.getint("hardware", "shareScsiNumber")
-        self.hwInfo.shareScsiHotplugSupport = cfg.getboolean("hardware", "shareScsiHotplugSupport")
+    def __init__(self):
+        self.qemuVmType = None                            # str        "pc", "q35"
+        self.cpuArch = None                                # str
+        self.cpuNumber = None                            # int
+        self.memorySize = None                            # int        unit: MB
+        self.mainDiskInterface = None                    # str        "virtio-blk" => "ide", '=>' means 'can fallback to'
+        self.mainDiskFormat = None                        # str        "raw-sparse" => "qcow2"
+        self.graphicsAdapterInterface = None                # str        "qxl" => "vga"
+        self.graphicsAdapterPciSlot = None                # int
+        self.soundAdapterInterface = None                # str        "ac97" => ""
+        self.soundAdapterPciSlot = None                    # int
+        self.networkAdapterInterface = None                # str        "virtio" => "user" => ""
+        self.networkAdapterPciSlot = None                # int
+        self.balloonDeviceSupport = None                    # bool
+        self.balloonDevicePciSlot = None                    # int
+        self.vdiPortDeviceSupport = None                    # bool
+        self.vdiPortDevicePciSlot = None                    # int
+        self.shareDirectoryNumber = None                    # int
+        self.shareDirectoryHotplugSupport = None            # bool
+        self.shareUsbNumber = None                        # int
+        self.shareUsbHotplugSupport = None                # bool
+        self.shareScsiNumber = None                        # int
+        self.shareScsiHotplugSupport = None                # bool
 
 
 class FvpVmObject(GObject.GObject):
-
     """A virtual machine
        The real path (absolute path) of the virtual machine is the object key"""
+
+    OS_MIN = 1
+    OS_MSWINXP_X86 = 1
+    OS_MSWIN7_X86 = 2
+    OS_MSWIN7_AMD64 = 3
+    OS_GENTOO_LINUX_X86 = 4
+    OS_MAX = 4
 
     STATE_MIN = 1
     STATE_POWER_OFF = 1
@@ -218,9 +81,14 @@ class FvpVmObject(GObject.GObject):
             e.message = "The specified virtual machine has been already opened by another program."
             raise e
 
-        self.vmCfg = FvpVmConfig()
-        self.vmCfg.readFromDisk(self.vmDir)
-        self.vmCfg.checkValid()
+        self.os = None
+        if True:
+            cfg = configparser.SafeConfigParser()
+            cfg.read(os.path.join(vmDir, "lightbox.ini"))
+            ret = cfg.get("main", "os")
+            if not ret.startswith("OS_") or not hasattr(FvpVmObject, ret):
+                raise Exception("The specified virtual machine has an invalid operating system")
+            self.os = getattr(FvpVmObject, ret)
 
         self.peripheralDict = dict()
 
@@ -242,6 +110,7 @@ class FvpVmObject(GObject.GObject):
 
         self.maxDriveId = 0
 
+        self.vmCfg = self._getVmCfgByOs()
         self.state = FvpVmObject.STATE_POWER_OFF
 
     def release(self):
@@ -254,9 +123,6 @@ class FvpVmObject(GObject.GObject):
 
     def getElemInfo(self):
         return self.elemObj.get_info()
-
-    def getVmCfg(self):
-        return self.vmCfg
 
     def getSpicePort(self):
         assert self.spicePort != -1
@@ -373,7 +239,7 @@ class FvpVmObject(GObject.GObject):
 
             self.vsVmResSetId = dbusObj.NewVmResSet(dbus_interface='org.fpemud.VirtService')
             resSetObj = dbus.SystemBus().get_object('org.fpemud.VirtService', '/org/fpemud/VirtService/%d/VmResSets/%d' % (os.getuid(), self.vsVmResSetId))
-            if self.vmCfg.hwInfo.networkAdapterInterface == "virtio":
+            if self.vmCfg.networkAdapterInterface == "virtio":
                 # resSetObj.AddTapIntf(self.vmEnv.getVirtioNetworkType())
                 resSetObj.AddTapIntf("nat")
 
@@ -450,6 +316,82 @@ class FvpVmObject(GObject.GObject):
             self.state = FvpVmObject.STATE_POWER_OFF
             self.notify("state")
 
+    def _getVmCfgByOs(self):
+        ret = FvpVmConfig()
+
+        if self.os == self.OS_MSWINXP_X86:
+            ret.qemuVmType = "pc"
+            ret.cpuArch = "x86"
+            ret.cpuNumber = 1
+            ret.memorySize = 1024                       # 1GB
+            ret.mainDiskInterface = "virtio-blk"
+            ret.mainDiskFormat = "raw-sparse"
+            ret.graphicsAdapterInterface = "vga"
+            ret.graphicsAdapterPciSlot = 7
+            ret.soundAdapterInterface = "ac97"
+            ret.soundAdapterPciSlot = 6
+            ret.networkAdapterInterface = "virtio"
+            ret.networkAdapterPciSlot = 5
+            ret.balloonDeviceSupport = True
+            ret.balloonDevicePciSlot = 4
+            ret.vdiPortDeviceSupport = True
+            ret.vdiPortDevicePciSlot = 3
+        elif self.os == self.OS_MSWIN7_X86:
+            ret.qemuVmType = "q35"
+            ret.cpuArch = "x86"
+            ret.cpuNumber = 1
+            ret.memorySize = 1024                       # 1GB
+            ret.mainDiskInterface = "virtio-blk"
+            ret.mainDiskFormat = "raw-sparse"
+            ret.graphicsAdapterInterface = "vga"
+            ret.graphicsAdapterPciSlot = 7
+            ret.soundAdapterInterface = "ac97"
+            ret.soundAdapterPciSlot = 6
+            ret.networkAdapterInterface = "virtio"
+            ret.networkAdapterPciSlot = 5
+            ret.balloonDeviceSupport = True
+            ret.balloonDevicePciSlot = 4
+            ret.vdiPortDeviceSupport = True
+            ret.vdiPortDevicePciSlot = 3
+        elif self.os == self.OS_MSWIN7_AMD64:
+            ret.qemuVmType = "q35"
+            ret.cpuArch = "amd64"
+            ret.cpuNumber = 1
+            ret.memorySize = 1024                       # 1GB
+            ret.mainDiskInterface = "virtio-blk"
+            ret.mainDiskFormat = "raw-sparse"
+            ret.graphicsAdapterInterface = "vga"
+            ret.graphicsAdapterPciSlot = 7
+            ret.soundAdapterInterface = "ac97"
+            ret.soundAdapterPciSlot = 6
+            ret.networkAdapterInterface = "virtio"
+            ret.networkAdapterPciSlot = 5
+            ret.balloonDeviceSupport = True
+            ret.balloonDevicePciSlot = 4
+            ret.vdiPortDeviceSupport = True
+            ret.vdiPortDevicePciSlot = 3
+        elif self.os == self.OS_GENTOO_LINUX_X86:
+            ret.qemuVmType = "q35"
+            ret.cpuArch = "amd64"
+            ret.cpuNumber = 1
+            ret.memorySize = 1024                       # 1GB
+            ret.mainDiskInterface = "virtio-blk"
+            ret.mainDiskFormat = "raw-sparse"
+            ret.graphicsAdapterInterface = "vga"
+            ret.graphicsAdapterPciSlot = 7
+            ret.soundAdapterInterface = "ac97"
+            ret.soundAdapterPciSlot = 6
+            ret.networkAdapterInterface = "virtio"
+            ret.networkAdapterPciSlot = 5
+            ret.balloonDeviceSupport = True
+            ret.balloonDevicePciSlot = 4
+            ret.vdiPortDeviceSupport = True
+            ret.vdiPortDevicePciSlot = 3
+        else:
+            assert False
+
+        return ret
+
     def _generateQemuCommand(self):
         """pci slot allcation:
                 slot 0x0.0x0:    host bridge
@@ -459,9 +401,9 @@ class FvpVmObject(GObject.GObject):
                 slot 0x2.0x0:    VGA controller
                 slot 0x3.0x0:    SCSI controller, main-disk"""
 
-        if self.vmCfg.hwInfo.qemuVmType == "pc":
+        if self.vmCfg.qemuVmType == "pc":
             pciBus = "pci.0"
-        elif self.vmCfg.hwInfo.qemuVmType == "q35":
+        elif self.vmCfg.qemuVmType == "q35":
             pciBus = "pcie.0"
         else:
             assert False
@@ -471,29 +413,29 @@ class FvpVmObject(GObject.GObject):
         cmd += " -enable-kvm"
         cmd += " -no-user-config"
         cmd += " -nodefaults"
-        cmd += " -machine %s,usb=on" % (self.vmCfg.hwInfo.qemuVmType)
+        cmd += " -machine %s,usb=on" % (self.vmCfg.qemuVmType)
 
         # platform device
         cmd += " -cpu host"
-        cmd += " -smp 1,sockets=1,cores=%d,threads=1" % (self.vmCfg.hwInfo.cpuNumber)
-        cmd += " -m %d" % (self.vmCfg.hwInfo.memorySize)
+        cmd += " -smp 1,sockets=1,cores=%d,threads=1" % (self.vmCfg.cpuNumber)
+        cmd += " -m %d" % (self.vmCfg.memorySize)
         cmd += " -rtc base=localtime"
 
         # main-disk
         if True:
-            if self.vmCfg.hwInfo.mainDiskFormat == "raw-sparse":
+            if self.vmCfg.mainDiskFormat == "raw-sparse":
                 cmd += " -drive \'file=%s,if=none,id=main-disk,format=%s\'" % (os.path.join(self.vmDir, "disk-main.img"), "raw")
             else:
                 cmd += " -drive \'file=%s,if=none,id=main-disk,format=%s\'" % (os.path.join(self.vmDir, "disk-main.img"), "qcow2")
-            if self.vmCfg.hwInfo.mainDiskInterface == "virtio-blk":
+            if self.vmCfg.mainDiskInterface == "virtio-blk":
                 cmd += " -device virtio-blk-pci,scsi=off,bus=%s,addr=0x03,drive=main-disk,id=main-disk,bootindex=1" % (pciBus)
-            elif self.vmCfg.hwInfo.mainDiskInterface == "virtio-scsi":
+            elif self.vmCfg.mainDiskInterface == "virtio-scsi":
                 cmd += " -device virtio-blk-pci,scsi=off,bus=%s,addr=0x03,drive=main-disk,id=main-disk,bootindex=1" % (pciBus)        # fixme
             else:
                 cmd += " -device ide-hd,bus=ide.0,unit=0,drive=main-disk,id=main-disk,bootindex=1"
 
         # graphics device
-        if self.vmCfg.hwInfo.graphicsAdapterInterface == "qxl":
+        if self.vmCfg.graphicsAdapterInterface == "qxl":
             assert self.spicePort != -1
             cmd += " -spice port=%d,addr=127.0.0.1,disable-ticketing,agent-mouse=off" % (self.spicePort)
             cmd += " -vga qxl -global qxl-vga.ram_size_mb=64 -global qxl-vga.vram_size_mb=64"
@@ -504,27 +446,27 @@ class FvpVmObject(GObject.GObject):
             cmd += " -device VGA,bus=%s,addr=0x04" % (pciBus)
 
         # sound device
-        if self.vmCfg.hwInfo.soundAdapterInterface == "ac97":
-            cmd += " -device AC97,id=sound0,bus=%s,addr=0x%x" % (pciBus, self.vmCfg.hwInfo.soundAdapterPciSlot)
+        if self.vmCfg.soundAdapterInterface == "ac97":
+            cmd += " -device AC97,id=sound0,bus=%s,addr=0x%x" % (pciBus, self.vmCfg.soundAdapterPciSlot)
 
         # network device
-        if self.vmCfg.hwInfo.networkAdapterInterface == "virtio":
+        if self.vmCfg.networkAdapterInterface == "virtio":
             cmd += " -netdev tap,id=eth0,ifname=%s,script=no,downscript=no" % (self.vsTapIfName)
-            cmd += " -device virtio-net-pci,netdev=eth0,mac=%s,bus=%s,addr=0x%x,romfile=" % (self.vsMacAddr, pciBus, self.vmCfg.hwInfo.networkAdapterPciSlot)
-        elif self.vmCfg.hwInfo.networkAdapterInterface == "user":
+            cmd += " -device virtio-net-pci,netdev=eth0,mac=%s,bus=%s,addr=0x%x,romfile=" % (self.vsMacAddr, pciBus, self.vmCfg.networkAdapterPciSlot)
+        elif self.vmCfg.networkAdapterInterface == "user":
             cmd += " -netdev user,id=eth0"
-            cmd += " -device rtl8139,netdev=eth0,bus=%s,addr=0x%x,romfile=" % (pciBus, self.vmCfg.hwInfo.networkAdapterPciSlot)
+            cmd += " -device rtl8139,netdev=eth0,bus=%s,addr=0x%x,romfile=" % (pciBus, self.vmCfg.networkAdapterPciSlot)
 
         # balloon device
-        if self.vmCfg.hwInfo.balloonDeviceSupport:
-            cmd += " -device virtio-balloon-pci,id=balloon0,bus=%s,addr=0x%x" % (pciBus, self.vmCfg.hwInfo.balloonDevicePciSlot)
+        if self.vmCfg.balloonDeviceSupport:
+            cmd += " -device virtio-balloon-pci,id=balloon0,bus=%s,addr=0x%x" % (pciBus, self.vmCfg.balloonDevicePciSlot)
 
         # vdi-port
-        if self.vmCfg.hwInfo.vdiPortDeviceSupport:
-            cmd += " -device virtio-serial-pci,id=vdi-port,bus=%s,addr=0x%x" % (pciBus, self.vmCfg.hwInfo.vdiPortDevicePciSlot)
+        if self.vmCfg.vdiPortDeviceSupport:
+            cmd += " -device virtio-serial-pci,id=vdi-port,bus=%s,addr=0x%x" % (pciBus, self.vmCfg.vdiPortDevicePciSlot)
 
             # usb redirection
-#            for i in range(0,self.vmCfg.hwInfo.shareUsbNumber):
+#            for i in range(0,self.vmCfg.shareUsbNumber):
 #                cmd += " -chardev spicevmc,name=usbredir,id=usbredir%d"%(i)
 #                cmd += " -device usb-redir,chardev=usbredir%d,id=usbredir%d"%(i,i)
 
