@@ -27,7 +27,7 @@ class FvpVmBuilder:
     def __init__(self):
         pass
 
-    def build_async(self, os_name, vmdir):
+    def build_async(self, os_name, dstdir, vm_name, vm_description, params):
         pass
 
     def build_cancel(self):
