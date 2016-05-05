@@ -16,14 +16,14 @@ class FvpApplication(Gtk.Application):
     """Application object for fvm-player"""
 
     def __init__(self):
-        Gtk.Application.__init__(self, application_id="org.fpemud.virt-player",
+        Gtk.Application.__init__(self, application_id="org.fpemud.lightbox",
                                  flags=Gio.ApplicationFlags.HANDLES_OPEN)
         self.param = FvpParam()
         self._main_win = None
 
     def do_startup(self):
         Gtk.Application.do_startup(self)
-        self.param.tmpDir = tempfile.mkdtemp(prefix="virt-player.")
+        self.param.tmpDir = tempfile.mkdtemp(prefix="lightbox.")
 
     def do_shutdown(self):
         # fixme: should stop vm

@@ -24,7 +24,6 @@ class FvpVmConfig:
         self.cpuNumber = None                            # int
         self.memorySize = None                            # int        unit: MB
         self.mainDiskInterface = None                    # str        "virtio-blk" => "ide", '=>' means 'can fallback to'
-        self.mainDiskFormat = None                        # str        "raw-sparse" => "qcow2"
         self.graphicsAdapterInterface = None                # str        "qxl" => "vga"
         self.graphicsAdapterPciSlot = None                # int
         self.soundAdapterInterface = None                # str        "ac97" => ""
@@ -235,7 +234,7 @@ class FvpVmObject(GObject.GObject):
         try:
             self.maxDriveId = 0
 
-            self.vmTmpDir = tempfile.mkdtemp(prefix="virt-player.vm.")
+            self.vmTmpDir = tempfile.mkdtemp(prefix="lightbox.vm.")
 
             self.vsVmResSetId = dbusObj.NewVmResSet(dbus_interface='org.fpemud.VirtService')
             resSetObj = dbus.SystemBus().get_object('org.fpemud.VirtService', '/org/fpemud/VirtService/%d/VmResSets/%d' % (os.getuid(), self.vsVmResSetId))
@@ -325,7 +324,6 @@ class FvpVmObject(GObject.GObject):
             ret.cpuNumber = 1
             ret.memorySize = 1024                       # 1GB
             ret.mainDiskInterface = "virtio-blk"
-            ret.mainDiskFormat = "raw-sparse"
             ret.graphicsAdapterInterface = "vga"
             ret.graphicsAdapterPciSlot = 7
             ret.soundAdapterInterface = "ac97"
@@ -342,7 +340,6 @@ class FvpVmObject(GObject.GObject):
             ret.cpuNumber = 1
             ret.memorySize = 1024                       # 1GB
             ret.mainDiskInterface = "virtio-blk"
-            ret.mainDiskFormat = "raw-sparse"
             ret.graphicsAdapterInterface = "vga"
             ret.graphicsAdapterPciSlot = 7
             ret.soundAdapterInterface = "ac97"
@@ -359,7 +356,6 @@ class FvpVmObject(GObject.GObject):
             ret.cpuNumber = 1
             ret.memorySize = 1024                       # 1GB
             ret.mainDiskInterface = "virtio-blk"
-            ret.mainDiskFormat = "raw-sparse"
             ret.graphicsAdapterInterface = "vga"
             ret.graphicsAdapterPciSlot = 7
             ret.soundAdapterInterface = "ac97"
@@ -376,7 +372,6 @@ class FvpVmObject(GObject.GObject):
             ret.cpuNumber = 1
             ret.memorySize = 1024                       # 1GB
             ret.mainDiskInterface = "virtio-blk"
-            ret.mainDiskFormat = "raw-sparse"
             ret.graphicsAdapterInterface = "vga"
             ret.graphicsAdapterPciSlot = 7
             ret.soundAdapterInterface = "ac97"
@@ -423,10 +418,7 @@ class FvpVmObject(GObject.GObject):
 
         # main-disk
         if True:
-            if self.vmCfg.mainDiskFormat == "raw-sparse":
-                cmd += " -drive \'file=%s,if=none,id=main-disk,format=%s\'" % (os.path.join(self.vmDir, "disk-main.img"), "raw")
-            else:
-                cmd += " -drive \'file=%s,if=none,id=main-disk,format=%s\'" % (os.path.join(self.vmDir, "disk-main.img"), "qcow2")
+            cmd += " -drive \'file=%s,if=none,id=main-disk,format=%s\'" % (os.path.join(self.vmDir, "disk-main.img"), "raw")
             if self.vmCfg.mainDiskInterface == "virtio-blk":
                 cmd += " -device virtio-blk-pci,scsi=off,bus=%s,addr=0x03,drive=main-disk,id=main-disk,bootindex=1" % (pciBus)
             elif self.vmCfg.mainDiskInterface == "virtio-scsi":

@@ -3,7 +3,7 @@
 
 import sys
 from gi.repository import GObject
-sys.path.append('/usr/lib/virt-player')
+sys.path.append('/usr/lib/lightbox')
 from fvp_application import FvpApplication
 
 GObject.threads_init()

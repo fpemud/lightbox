@@ -14,6 +14,17 @@ import re
 class FvpUtil:
 
     @staticmethod
+    def getHostArch():
+        # Code copied from /usr/src/linux/Makefile
+        ret = FvpUtil.shell("/usr/bin/uname -m | /bin/sed -e s/i.86/i386/ -e s/sun4u/sparc64/" +
+                            "                             -e s/arm.*/arm/ -e s/sa110/arm/" +
+                            "                             -e s/s390x/s390/ -e s/parisc64/parisc/" +
+                            "                             -e s/ppc.*/powerpc/ -e s/mips.*/mips/" +
+                            "                             -e s/sh.*/sh/", "stdout")
+        ret = ret.replace("\n", "")
+        return ret
+
+    @staticmethod
     def str2bool(value):
         """in function bool() of python, "" => False, all others => True, it's strange"""
 

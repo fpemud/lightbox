@@ -7,7 +7,7 @@ import os
 class FvpParam:
 
     """Config directory structure:
-         /etc/virt-player
+         /etc/lightbox
            |--global.conf
 
        Virt-machine directory structure:
@@ -17,7 +17,7 @@ class FvpParam:
                |--lock								lock file
 
        temp directory structure:
-         /tmp/virt-player-[uid]-[vmname]
+         /tmp/lightbox-[uid]-[vmname]
         |--qemu.log								log file
         |--qemu_monitor.log
         |--spice.log"""
@@ -27,7 +27,7 @@ class FvpParam:
         self.gid = os.getgid()
         self.pwd = os.getcwd()
 
-        self.libDir = "/usr/lib/virt-player"
+        self.libDir = "/usr/lib/lightbox"
         self.tmpDir = None
         self.keepTmpDir = False
 
