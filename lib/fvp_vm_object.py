@@ -80,14 +80,14 @@ class FvpVmObject(GObject.GObject):
             e.message = "The specified virtual machine has been already opened by another program."
             raise e
 
-        self.os = None
+        self.os_type = None
         if True:
             cfg = configparser.SafeConfigParser()
             cfg.read(os.path.join(vmDir, "lightbox.ini"))
-            ret = cfg.get("main", "os")
+            ret = cfg.get("main", "os_type")
             if not ret.startswith("OS_") or not hasattr(FvpVmObject, ret):
                 raise Exception("The specified virtual machine has an invalid operating system")
-            self.os = getattr(FvpVmObject, ret)
+            self.os_type = getattr(FvpVmObject, ret)
 
         self.peripheralDict = dict()
 
