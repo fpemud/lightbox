@@ -240,12 +240,12 @@ class FvpVmObject(GObject.GObject):
             resSetObj = dbus.SystemBus().get_object('org.fpemud.VirtService', '/org/fpemud/VirtService/%d/VmResSets/%d' % (os.getuid(), self.vsVmResSetId))
             if self.vmCfg.networkAdapterInterface == "virtio":
                 # resSetObj.AddTapIntf(self.vmEnv.getVirtioNetworkType())
-                resSetObj.AddTapIntf("nat")
+                resSetObj.AddTapIntf("nat", dbus_interface='org.fpemud.VirtService.VmResSet')
 
-            self.vsVmId = dbusObj.AttachVm(self.vmDir, self.vsVmResSetId)
-            self.vsTapIfName = resSetObj.GetTapIntf()
-            self.vsMacAddr = resSetObj.GetVmMacAddr()
-            self.vsIpAddr = resSetObj.GetVmIpAddr()
+            self.vsVmId = dbusObj.AttachVm(self.vmDir, self.vsVmResSetId, dbus_interface='org.fpemud.VirtService')
+            self.vsTapIfName = resSetObj.GetTapIntf(dbus_interface='org.fpemud.VirtService.VmResSet')
+            self.vsMacAddr = resSetObj.GetVmMacAddr(dbus_interface='org.fpemud.VirtService.VmResSet')
+            self.vsIpAddr = resSetObj.GetVmIpAddr(dbus_interface='org.fpemud.VirtService.VmResSet')
 
             self.spicePort = FvpUtil.getFreeSocketPort("tcp", self.param.spicePortStart, self.param.spicePortEnd)
             self.qmpPort = FvpUtil.getFreeSocketPort("tcp")
@@ -298,11 +298,11 @@ class FvpVmObject(GObject.GObject):
         self.vsTapIfName = None
 
         if self.vsVmId is not None:
-            dbusObj.DetachVm(self.vsVmId)
+            dbusObj.DetachVm(self.vsVmId, dbus_interface='org.fpemud.VirtService')
             self.vsVmId = None
 
         if self.vsVmResSetId is not None:
-            dbusObj.DeleteVmResSet(self.vsVmResSetId)
+            dbusObj.DeleteVmResSet(self.vsVmResSetId, dbus_interface='org.fpemud.VirtService')
             self.vsVmResSetId = None
 
         if self.vmTmpDir is not None:
@@ -318,13 +318,13 @@ class FvpVmObject(GObject.GObject):
     def _getVmCfgByOs(self):
         ret = FvpVmConfig()
 
-        if self.os == self.OS_MSWINXP_X86:
+        if self.os_type == self.OS_MSWINXP_X86:
             ret.qemuVmType = "pc"
             ret.cpuArch = "x86"
             ret.cpuNumber = 1
             ret.memorySize = 1024                       # 1GB
             ret.mainDiskInterface = "virtio-blk"
-            ret.graphicsAdapterInterface = "vga"
+            ret.graphicsAdapterInterface = "qxl"
             ret.graphicsAdapterPciSlot = 7
             ret.soundAdapterInterface = "ac97"
             ret.soundAdapterPciSlot = 6
@@ -334,7 +334,7 @@ class FvpVmObject(GObject.GObject):
             ret.balloonDevicePciSlot = 4
             ret.vdiPortDeviceSupport = True
             ret.vdiPortDevicePciSlot = 3
-        elif self.os == self.OS_MSWIN7_X86:
+        elif self.os_type == self.OS_MSWIN7_X86:
             ret.qemuVmType = "q35"
             ret.cpuArch = "x86"
             ret.cpuNumber = 1
@@ -350,7 +350,7 @@ class FvpVmObject(GObject.GObject):
             ret.balloonDevicePciSlot = 4
             ret.vdiPortDeviceSupport = True
             ret.vdiPortDevicePciSlot = 3
-        elif self.os == self.OS_MSWIN7_AMD64:
+        elif self.os_type == self.OS_MSWIN7_AMD64:
             ret.qemuVmType = "q35"
             ret.cpuArch = "amd64"
             ret.cpuNumber = 1
@@ -366,7 +366,7 @@ class FvpVmObject(GObject.GObject):
             ret.balloonDevicePciSlot = 4
             ret.vdiPortDeviceSupport = True
             ret.vdiPortDevicePciSlot = 3
-        elif self.os == self.OS_GENTOO_LINUX_X86:
+        elif self.os_type == self.OS_GENTOO_LINUX_X86:
             ret.qemuVmType = "q35"
             ret.cpuArch = "amd64"
             ret.cpuNumber = 1
@@ -398,8 +398,10 @@ class FvpVmObject(GObject.GObject):
 
         if self.vmCfg.qemuVmType == "pc":
             pciBus = "pci.0"
+            pciSlot = 3
         elif self.vmCfg.qemuVmType == "q35":
             pciBus = "pcie.0"
+            pciSlot = 3
         else:
             assert False
 
@@ -420,42 +422,49 @@ class FvpVmObject(GObject.GObject):
         if True:
             cmd += " -drive \'file=%s,if=none,id=main-disk,format=%s\'" % (os.path.join(self.vmDir, "disk-main.img"), "raw")
             if self.vmCfg.mainDiskInterface == "virtio-blk":
-                cmd += " -device virtio-blk-pci,scsi=off,bus=%s,addr=0x03,drive=main-disk,id=main-disk,bootindex=1" % (pciBus)
+                cmd += " -device virtio-blk-pci,scsi=off,bus=%s,addr=0x%02x,drive=main-disk,id=main-disk,bootindex=1" % (pciBus, pciSlot)
             elif self.vmCfg.mainDiskInterface == "virtio-scsi":
-                cmd += " -device virtio-blk-pci,scsi=off,bus=%s,addr=0x03,drive=main-disk,id=main-disk,bootindex=1" % (pciBus)        # fixme
+                cmd += " -device virtio-blk-pci,scsi=off,bus=%s,addr=0x%02x,drive=main-disk,id=main-disk,bootindex=1" % (pciBus, pciSlot)        # fixme
             else:
                 cmd += " -device ide-hd,bus=ide.0,unit=0,drive=main-disk,id=main-disk,bootindex=1"
+            pciSlot += 1
 
         # graphics device
-        if self.vmCfg.graphicsAdapterInterface == "qxl":
-            assert self.spicePort != -1
-            cmd += " -spice port=%d,addr=127.0.0.1,disable-ticketing,agent-mouse=off" % (self.spicePort)
-            cmd += " -vga qxl -global qxl-vga.ram_size_mb=64 -global qxl-vga.vram_size_mb=64"
-#            cmd += " -device qxl-vga,bus=%s,addr=0x04,ram_size_mb=64,vram_size_mb=64"%(pciBus)                        # see https://bugzilla.redhat.com/show_bug.cgi?id=915352
-        else:
-            assert self.spicePort != -1
-            cmd += " -spice port=%d,addr=127.0.0.1,disable-ticketing,agent-mouse=off" % (self.spicePort)
-            cmd += " -device VGA,bus=%s,addr=0x04" % (pciBus)
+        if True:
+            if self.vmCfg.graphicsAdapterInterface == "qxl":
+                assert self.spicePort != -1
+                cmd += " -spice port=%d,addr=127.0.0.1,disable-ticketing,agent-mouse=off" % (self.spicePort)
+                cmd += " -vga qxl -global qxl-vga.ram_size_mb=64 -global qxl-vga.vram_size_mb=64"
+    #            cmd += " -device qxl-vga,bus=%s,addr=0x04,ram_size_mb=64,vram_size_mb=64"%(pciBus)                        # see https://bugzilla.redhat.com/show_bug.cgi?id=915352
+            else:
+                assert self.spicePort != -1
+                cmd += " -spice port=%d,addr=127.0.0.1,disable-ticketing,agent-mouse=off" % (self.spicePort)
+                cmd += " -device VGA,bus=%s,addr=0x%02x" % (pciBus, pciSlot)
+            pciSlot += 1
 
         # sound device
         if self.vmCfg.soundAdapterInterface == "ac97":
-            cmd += " -device AC97,id=sound0,bus=%s,addr=0x%x" % (pciBus, self.vmCfg.soundAdapterPciSlot)
+            cmd += " -device AC97,id=sound0,bus=%s,addr=0x%02x" % (pciBus, pciSlot)
+            pciSlot += 1
 
         # network device
-        if self.vmCfg.networkAdapterInterface == "virtio":
-            cmd += " -netdev tap,id=eth0,ifname=%s,script=no,downscript=no" % (self.vsTapIfName)
-            cmd += " -device virtio-net-pci,netdev=eth0,mac=%s,bus=%s,addr=0x%x,romfile=" % (self.vsMacAddr, pciBus, self.vmCfg.networkAdapterPciSlot)
-        elif self.vmCfg.networkAdapterInterface == "user":
-            cmd += " -netdev user,id=eth0"
-            cmd += " -device rtl8139,netdev=eth0,bus=%s,addr=0x%x,romfile=" % (pciBus, self.vmCfg.networkAdapterPciSlot)
+        if True:
+            if self.vmCfg.networkAdapterInterface == "virtio":
+                cmd += " -netdev tap,id=eth0,ifname=%s,script=no,downscript=no" % (self.vsTapIfName)
+                cmd += " -device virtio-net-pci,netdev=eth0,mac=%s,bus=%s,addr=0x%02x,romfile=" % (self.vsMacAddr, pciBus, pciSlot)
+            elif self.vmCfg.networkAdapterInterface == "user":
+                cmd += " -netdev user,id=eth0"
+                cmd += " -device rtl8139,netdev=eth0,bus=%s,addr=0x%02x,romfile=" % (pciBus, pciSlot)
+            pciSlot += 1
 
         # balloon device
         if self.vmCfg.balloonDeviceSupport:
-            cmd += " -device virtio-balloon-pci,id=balloon0,bus=%s,addr=0x%x" % (pciBus, self.vmCfg.balloonDevicePciSlot)
+            cmd += " -device virtio-balloon-pci,id=balloon0,bus=%s,addr=0x%02x" % (pciBus, pciSlot)
+            pciSlot += 1
 
         # vdi-port
         if self.vmCfg.vdiPortDeviceSupport:
-            cmd += " -device virtio-serial-pci,id=vdi-port,bus=%s,addr=0x%x" % (pciBus, self.vmCfg.vdiPortDevicePciSlot)
+            cmd += " -device virtio-serial-pci,id=vdi-port,bus=%s,addr=0x%02x" % (pciBus, pciSlot)
 
             # usb redirection
 #            for i in range(0,self.vmCfg.shareUsbNumber):
@@ -465,6 +474,7 @@ class FvpVmObject(GObject.GObject):
             # vdagent
             cmd += " -chardev spicevmc,id=vdagent,debug=0,name=vdagent"
             cmd += " -device virtserialport,chardev=vdagent,name=com.redhat.spice.0"
+            pciSlot += 1
 
         # monitor interface
         if True:
@@ -571,7 +581,7 @@ class FvpVmObject(GObject.GObject):
         # do job
         if paDevType == "network-share":
             rsObj = dbus.SystemBus().get_object('org.fpemud.VirtService', '/org/fpemud/VirtService/%d/VmResSets/%d' % (os.getuid(), self.vsVmResSetId))
-            rsObj.NewSambaShare(pObj.pName, paPath, paReadonly)
+            rsObj.NewSambaShare(pObj.pName, paPath, paReadonly, dbus_interface='org.fpemud.VirtService.VmResSet')
             # fixme: let the vm map the network drive
         else:
             assert False
@@ -583,7 +593,7 @@ class FvpVmObject(GObject.GObject):
         if pObj.paramDict["dev-type"] == "network-share":
             rsObj = dbus.SystemBus().get_object('org.fpemud.VirtService', '/org/fpemud/VirtService/%d/VmResSets/%d' % (os.getuid(), self.vsVmResSetId))
             # fixme: let the vm unmap the network drive
-            rsObj.DeleteSambaShare(pObj.pName)
+            rsObj.DeleteSambaShare(pObj.pName, dbus_interface='org.fpemud.VirtService.VmResSet')
         else:
             assert False
 
