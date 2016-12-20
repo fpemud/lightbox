@@ -39,3 +39,5 @@ class FvpParam:
         self.spicePortEnd = 5999
         self.tapIdStart = 0
         self.tapIdEnd = 100
+
+        self.pluginManager = None

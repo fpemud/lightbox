@@ -46,13 +46,6 @@ class FvpVmObject(GObject.GObject):
     """A virtual machine
        The real path (absolute path) of the virtual machine is the object key"""
 
-    OS_MIN = 1
-    OS_MSWINXP_X86 = 1
-    OS_MSWIN7_X86 = 2
-    OS_MSWIN7_AMD64 = 3
-    OS_GENTOO_LINUX_X86 = 4
-    OS_MAX = 4
-
     STATE_MIN = 1
     STATE_POWER_OFF = 1
     STATE_POWER_ON = 2
@@ -316,75 +309,12 @@ class FvpVmObject(GObject.GObject):
             self.notify("state")
 
     def _getVmCfgByOs(self):
+        plugin = self.param.pluginManager.getVmrPlugin(self.os_type)
+        if plugin is None:
+            raise Exception("no VMR plugin")
+
         ret = FvpVmConfig()
-
-        if self.os_type == self.OS_MSWINXP_X86:
-            ret.qemuVmType = "pc"
-            ret.cpuArch = "x86"
-            ret.cpuNumber = 1
-            ret.memorySize = 1024                       # 1GB
-            ret.mainDiskInterface = "virtio-blk"
-            ret.graphicsAdapterInterface = "qxl"
-            ret.graphicsAdapterPciSlot = 7
-            ret.soundAdapterInterface = "ac97"
-            ret.soundAdapterPciSlot = 6
-            ret.networkAdapterInterface = "virtio"
-            ret.networkAdapterPciSlot = 5
-            ret.balloonDeviceSupport = True
-            ret.balloonDevicePciSlot = 4
-            ret.vdiPortDeviceSupport = True
-            ret.vdiPortDevicePciSlot = 3
-        elif self.os_type == self.OS_MSWIN7_X86:
-            ret.qemuVmType = "q35"
-            ret.cpuArch = "x86"
-            ret.cpuNumber = 1
-            ret.memorySize = 1024                       # 1GB
-            ret.mainDiskInterface = "virtio-blk"
-            ret.graphicsAdapterInterface = "vga"
-            ret.graphicsAdapterPciSlot = 7
-            ret.soundAdapterInterface = "ac97"
-            ret.soundAdapterPciSlot = 6
-            ret.networkAdapterInterface = "virtio"
-            ret.networkAdapterPciSlot = 5
-            ret.balloonDeviceSupport = True
-            ret.balloonDevicePciSlot = 4
-            ret.vdiPortDeviceSupport = True
-            ret.vdiPortDevicePciSlot = 3
-        elif self.os_type == self.OS_MSWIN7_AMD64:
-            ret.qemuVmType = "q35"
-            ret.cpuArch = "amd64"
-            ret.cpuNumber = 1
-            ret.memorySize = 1024                       # 1GB
-            ret.mainDiskInterface = "virtio-blk"
-            ret.graphicsAdapterInterface = "vga"
-            ret.graphicsAdapterPciSlot = 7
-            ret.soundAdapterInterface = "ac97"
-            ret.soundAdapterPciSlot = 6
-            ret.networkAdapterInterface = "virtio"
-            ret.networkAdapterPciSlot = 5
-            ret.balloonDeviceSupport = True
-            ret.balloonDevicePciSlot = 4
-            ret.vdiPortDeviceSupport = True
-            ret.vdiPortDevicePciSlot = 3
-        elif self.os_type == self.OS_GENTOO_LINUX_X86:
-            ret.qemuVmType = "q35"
-            ret.cpuArch = "amd64"
-            ret.cpuNumber = 1
-            ret.memorySize = 1024                       # 1GB
-            ret.mainDiskInterface = "virtio-blk"
-            ret.graphicsAdapterInterface = "vga"
-            ret.graphicsAdapterPciSlot = 7
-            ret.soundAdapterInterface = "ac97"
-            ret.soundAdapterPciSlot = 6
-            ret.networkAdapterInterface = "virtio"
-            ret.networkAdapterPciSlot = 5
-            ret.balloonDeviceSupport = True
-            ret.balloonDevicePciSlot = 4
-            ret.vdiPortDeviceSupport = True
-            ret.vdiPortDevicePciSlot = 3
-        else:
-            assert False
-
+        plugin.update_vm_config(self.os_type, ret)
         return ret
 
     def _generateQemuCommand(self):

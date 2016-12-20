@@ -24,6 +24,7 @@ class FvpApplication(Gtk.Application):
     def do_startup(self):
         Gtk.Application.do_startup(self)
         self.param.tmpDir = tempfile.mkdtemp(prefix="lightbox.")
+        self.param.pluginManager = FvpPluginManager(self.param)
 
     def do_shutdown(self):
         # fixme: should stop vm
