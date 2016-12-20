@@ -1,16 +1,34 @@
 #!/usr/bin/python3
 # -*- coding: utf-8; tab-width: 4; indent-tabs-mode: t -*-
 
-class LbVmrPlugin:
 
-    def get_os_type_list(self):
+class LbVmbPlugin:
+
+    def __init__(self):
+        self.OS_CENTOS_7_X86 = "CentOS.7.X86"
+        self.OS_CENTOS_7_AMD64 = "CentOS.7.X86_64"
+
+        self.proc = None
+        self.errThread = None
+        self.dest = None
+        self.progress_callback = None
+
+    def get_os_name_list(self):
         return [
-            "GENTOO_LINUX_X86",
-            "GENERIC_LINUX_X86",
-            "GENERIC_LINUX_AMD64",
+            self.OS_CENTOS_7_X86,
+            self.OS_CENTOS_7_AMD64,
         ]
 
-    def update_vm_config(self, os_type, vm_config):
+    def os_create_setup_iso_async(self, tmp_dir, os_name, progress_callback):
+        assert False
+
+    def os_create_setup_iso_cancel(self):
+        assert False
+
+    def os_create_setup_iso_finish(self):
+        assert False
+
+    def os_update_vm_config(self, os_name, vm_config):
         vm_config.qemuVmType = "q35"
         vm_config.cpuArch = "amd64"
         vm_config.cpuNumber = 1
@@ -27,5 +45,5 @@ class LbVmrPlugin:
         vm_config.vdiPortDeviceSupport = True
         vm_config.vdiPortDevicePciSlot = 3
 
-    def get_main_disk_size(self, os_type):
+    def get_main_disk_size(self, os_name):
         return 10000                                        # 10GB

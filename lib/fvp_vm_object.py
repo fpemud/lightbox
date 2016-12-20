@@ -73,14 +73,13 @@ class FvpVmObject(GObject.GObject):
             e.message = "The specified virtual machine has been already opened by another program."
             raise e
 
-        self.os_type = None
         if True:
             cfg = configparser.SafeConfigParser()
             cfg.read(os.path.join(vmDir, "lightbox.ini"))
-            ret = cfg.get("main", "os_type")
-            if not ret.startswith("OS_") or not hasattr(FvpVmObject, ret):
+            self.os_name = cfg.get("main", "os_name")
+            self.plugin = self.param.pluginManager.getPlugin(self.os_name)
+            if self.plugin is None:
                 raise Exception("The specified virtual machine has an invalid operating system")
-            self.os_type = getattr(FvpVmObject, ret)
 
         self.peripheralDict = dict()
 
@@ -102,7 +101,9 @@ class FvpVmObject(GObject.GObject):
 
         self.maxDriveId = 0
 
-        self.vmCfg = self._getVmCfgByOs()
+        self.vmCfg = FvpVmConfig()
+        self.plugin.os_update_vm_config(self.os_name, self.vmCfg)
+
         self.state = FvpVmObject.STATE_POWER_OFF
 
     def release(self):
@@ -307,15 +308,6 @@ class FvpVmObject(GObject.GObject):
         if not inException:
             self.state = FvpVmObject.STATE_POWER_OFF
             self.notify("state")
-
-    def _getVmCfgByOs(self):
-        plugin = self.param.pluginManager.getVmrPlugin(self.os_type)
-        if plugin is None:
-            raise Exception("no VMR plugin")
-
-        ret = FvpVmConfig()
-        plugin.update_vm_config(self.os_type, ret)
-        return ret
 
     def _generateQemuCommand(self):
         """pci slot allcation:

@@ -36,9 +36,6 @@ class LbVmbPlugin:
     def get_os_name_list(self):
         return list(self.osDict.keys())
 
-    def os_get_type(self, os_name):
-        return self.osDict[os_name][1]
-
     def os_create_setup_iso_async(self, tmp_dir, os_name, progress_callback):
         assert self.proc is None and self.errThread is None and self.dest is None
         self.dest = os.path.join(tmp_dir, "unattended.iso")

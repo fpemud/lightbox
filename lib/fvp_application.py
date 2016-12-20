@@ -7,6 +7,7 @@ from gi.repository import GLib
 from gi.repository import Gio
 from gi.repository import Gtk
 from fvp_param import FvpParam
+from fvp_plugin_manager import FvpPluginManager
 from fvp_vm_environment import FvpVmEnvironment
 from fvp_window import FvpWindow
 
