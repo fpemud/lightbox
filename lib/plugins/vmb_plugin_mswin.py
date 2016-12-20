@@ -16,7 +16,7 @@ class LbVmbPlugin:
             self.OS_MSWIN7_AMD64,
         ]
 
-    def os_update_vm_config(self, os_name, vm_config):
+    def update_vm_config(self, os_name, vm_config):
         if os_name == self.OS_MSWINXP_X86:
             vm_config.qemuVmType = "pc"
             vm_config.cpuArch = "x86"

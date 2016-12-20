@@ -11,16 +11,16 @@ class FvpVmbPlugin:
     def get_os_name_list(self):
         pass
 
-    def os_create_setup_iso_async(self, tmp_dir, os_name, progress_callback):
+    def create_setup_iso_async(self, tmp_dir, os_name, progress_callback):
         pass
 
-    def os_create_setup_iso_cancel(self):
+    def create_setup_iso_cancel(self):
         pass
 
-    def os_create_setup_iso_finish(self):
+    def create_setup_iso_finish(self):
         pass
 
-    def os_update_vm_config(self, os_name, vm_config):
+    def update_vm_config(self, os_name, vm_config):
         pass
 
     def get_main_disk_size(self, os_name):

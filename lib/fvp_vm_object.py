@@ -102,7 +102,7 @@ class FvpVmObject(GObject.GObject):
         self.maxDriveId = 0
 
         self.vmCfg = FvpVmConfig()
-        self.plugin.os_update_vm_config(self.os_name, self.vmCfg)
+        self.plugin.update_vm_config(self.os_name, self.vmCfg)
 
         self.state = FvpVmObject.STATE_POWER_OFF
 
