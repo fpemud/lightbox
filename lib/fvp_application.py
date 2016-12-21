@@ -6,9 +6,9 @@ import shutil
 from gi.repository import GLib
 from gi.repository import Gio
 from gi.repository import Gtk
-from fvp_param import FvpParam
-from fvp_plugin_manager import FvpPluginManager
-from fvp_vm_environment import FvpVmEnvironment
+from core.param import FvpParam
+from core.plugin_manager import FvpPluginManager
+from core.vm_environment import FvpVmEnvironment
 from fvp_window import FvpWindow
 
 

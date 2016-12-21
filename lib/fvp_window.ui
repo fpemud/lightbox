@@ -25,6 +25,14 @@
   </object>
   <object class="GtkActionGroup" id="actiongroup-vm">
     <child>
+      <object class="GtkAction" id="action-vm-new">
+        <property name="label" translatable="yes">_New</property>
+        <property name="tooltip" translatable="yes">New virtual machine</property>
+        <property name="icon_name">document-new</property>
+        <signal name="activate" handler="on_action_vm_new" swapped="no"/>
+      </object>
+    </child>
+    <child>
       <object class="GtkAction" id="action-vm-power">
         <property name="label" translatable="yes">_Power</property>
         <property name="tooltip" translatable="yes">Power button of virtual machine</property>

@@ -5,7 +5,7 @@ import os
 import traceback
 from gi.repository import Gtk
 from autodrawer import AutoDrawer
-from fvp_vm_object import FvpVmObject
+from core.vm_object import FvpVmObject
 from fvp_vm_viewer import FvpVmViewer
 
 
@@ -60,6 +60,10 @@ class FvpWindow(Gtk.ApplicationWindow):
     def on_action_quit(self, data=None):
         assert False
         print("on_action_app_quit")
+
+    def on_action_vm_new(self, data=None):
+        assert False
+        print("on_action_vm_new")
 
     def on_action_vm_power(self, data=None):
         assert self.vmObj is not None           # action should be in disable state when self.vmObj is None
