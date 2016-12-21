@@ -15,8 +15,6 @@ class LbVmbPlugin:
         self.OS_CENTOS_7_AMD64 = "CentOS.7.X86_64"
 
         self.proc = None
-        self.errThread = None
-        self.dest = None
         self.progress_callback = None
 
     def get_os_name_list(self):
@@ -32,7 +30,10 @@ class LbVmbPlugin:
 
         isoFile = self._getIsoFile(os_name)
         if not os.path.exists(isoFile):
-            raise Exception("ISO file \"%s\" does not exist" % (isoFile))
+            raise Exception("File \"%s\" does not exist" % (isoFile))
+
+        self.proc = multiprocessing.Process(target=self._createNewIso, args=(tmp_dir, os_name, isoFile, ))
+        return self.proc.stdout
 
     def create_setup_iso_cancel(self):
         assert False
