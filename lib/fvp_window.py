@@ -8,7 +8,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from autodrawer import AutoDrawer
 from core.vm_object import FvpVmObject
-from fvp_vm_viewer import FvpVmViewer
+from fvp_view_run import FvpVmViewer
 
 
 class FvpWindow(Gtk.ApplicationWindow):
@@ -64,8 +64,12 @@ class FvpWindow(Gtk.ApplicationWindow):
         print("on_action_app_quit")
 
     def on_action_vm_new(self, data=None):
-        assert False
-        print("on_action_vm_new")
+
+    def on_action_vm_open(self, data=None):
+        try:
+            self.openVm()
+        except:
+            self._showException()
 
     def on_action_vm_power(self, data=None):
         assert self.vmObj is not None           # action should be in disable state when self.vmObj is None
@@ -104,9 +108,26 @@ class FvpWindow(Gtk.ApplicationWindow):
         except:
             self._showException()
 
-    def openVm(self, vmDir):
-        assert self.vmObj is None and self.vmEnv is None
+    def newVm(self):
         try:
+            if self.vmObj is not None and vmObj.get_property("state") == FvpVmObject.STATE_POWER_ON:
+                raise Exception("Please power off the curret virtual machine")
+
+            if self.vmObj is not None:
+                self.vmObj.release()
+                self.vmObj = None
+                self.vmEnv = None
+        except:
+            self._showException()
+
+    def openVm(self, vmDir):
+        try:
+            if self.vmObj is not None and vmObj.get_property("state") == FvpVmObject.STATE_POWER_ON:
+                raise Exception("Please power off the curret virtual machine")
+
+            if self.vmObj is not None:
+                self.vmObj.release()
+
             self.vmObj = FvpVmObject(self.param, vmDir)
             self.vmEnv = self.application.getVmEnvironment(self.vmObj.getVmDir())
 

@@ -33,6 +33,14 @@
       </object>
     </child>
     <child>
+      <object class="GtkAction" id="action-vm-open">
+        <property name="label" translatable="yes">_Open</property>
+        <property name="tooltip" translatable="yes">Open virtual machine</property>
+        <property name="icon_name">document-open</property>
+        <signal name="activate" handler="on_action_vm_open" swapped="no"/>
+      </object>
+    </child>
+    <child>
       <object class="GtkAction" id="action-vm-power">
         <property name="label" translatable="yes">_Power</property>
         <property name="tooltip" translatable="yes">Power button of virtual machine</property>
@@ -122,6 +130,28 @@
               <object class="GtkMenu" id="vm-menu">
                 <property name="can_focus">False</property>
                 <child>
+                  <object class="GtkMenuItem" id="vm-new">
+                    <property name="related_action">action-vm-new</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="use_underline">True</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkMenuItem" id="vm-open">
+                    <property name="related_action">action-vm-open</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="use_underline">True</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkSeparatorMenuItem" id="separator11">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                  </object>
+                </child>
+                <child>
                   <object class="GtkMenuItem" id="vm-power">
                     <property name="related_action">action-vm-power</property>
                     <property name="visible">True</property>
@@ -138,7 +168,7 @@
                   </object>
                 </child>
                 <child>
-                  <object class="GtkSeparatorMenuItem" id="separator11">
+                  <object class="GtkSeparatorMenuItem" id="separator12">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                   </object>
