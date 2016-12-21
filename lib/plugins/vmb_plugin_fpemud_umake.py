@@ -4,29 +4,14 @@
 import os
 import subprocess
 import threading
-from collections import OrderedDict
 
 
 class LbVmbPlugin:
 
     def __init__(self):
-        self.osDict = OrderedDict()
-
-        self.osDict["Fpemud's Windows.XP"] = (
-            "Microsoft.Windows.XP.Professional.X86",
-            "OS_MSWINXP_X86",
-        )
-
-        if self._getHostArch() == "x86_64":
-            self.osDict["Fpemud's Windows.7"] = (
-                "Microsoft.Windows.7.Ultimate.X86_64",
-                "OS_MSWIN7_AMD64",
-            )
-        else:
-            self.osDict["Fpemud's Windows.7"] = (
-                "Microsoft.Windows.7.Ultimate.X86",
-                "OS_MSWIN7_X86",
-            )
+        self.OS_MSWINXP_X86 = "Fpemud's Windows.XP (X86)"
+        self.OS_MSWIN7_X86 = "Fpemud's Windows.7 (X86)"
+        self.OS_MSWIN7_AMD64 = "Fpemud's Windows.7 (X86_64)"
 
         self.proc = None
         self.errThread = None
@@ -34,12 +19,19 @@ class LbVmbPlugin:
         self.progress_callback = None
 
     def get_os_name_list(self):
-        return list(self.osDict.keys())
+        return [
+            self.OS_MSWINXP_X86,
+            self.OS_MSWIN7_X86,
+            self.OS_MSWIN7_AMD64,
+        ]
+
+    def get_os_icon(self):
+        return None
 
     def create_setup_iso_async(self, tmp_dir, os_name, progress_callback):
         assert self.proc is None and self.errThread is None and self.dest is None
         self.dest = os.path.join(tmp_dir, "unattended.iso")
-        cmd = "/usr/bin/fpemud-umake --os \"%s\" --media image --dot-progress \"%s\"" % (self.osDict[os_name][0], self.dest)
+        cmd = "/usr/bin/fpemud-umake --os \"%s\" --media image --dot-progress \"%s\"" % (os_name, self.dest)
         self.proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         self.errThread = _ErrThread(self.proc)
         self.errThread.start()

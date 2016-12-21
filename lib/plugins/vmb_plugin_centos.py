@@ -4,6 +4,7 @@
 import os
 import subprocess
 import shutil
+import multiprocessing
 
 
 class LbVmbPlugin:
@@ -24,6 +25,9 @@ class LbVmbPlugin:
             self.OS_CENTOS_7_X86,
             self.OS_CENTOS_7_AMD64,
         ]
+
+    def get_os_icon(self):
+        return None
 
     def create_setup_iso_async(self, tmp_dir, os_name, progress_callback):
         assert self.proc is None and self.errThread is None and self.dest is None

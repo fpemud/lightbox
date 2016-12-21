@@ -11,6 +11,9 @@ class FvpVmbPlugin:
     def get_os_name_list(self):
         pass
 
+    def get_os_icon(self, os_name):
+        pass
+
     def create_setup_iso_async(self, tmp_dir, os_name, progress_callback):
         pass
 

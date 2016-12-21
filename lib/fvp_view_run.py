@@ -4,13 +4,13 @@
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import GObject
-from gi.repository import Gtk
 from gi.repository import Gdk
+from gi.repository import Gtk
 from gi.repository import SpiceClientGLib
 from gi.repository import SpiceClientGtk
 
 
-class FvpVmViewer(Gtk.HBox):
+class FvpViewRun(Gtk.HBox):
 
     """A virtual machine viewer"""
 
@@ -19,14 +19,14 @@ class FvpVmViewer(Gtk.HBox):
     STATE_RUNNING = 3
 
     def __init__(self):
-        super(FvpVmViewer, self).__init__()
+        super(FvpViewRun, self).__init__()
 
         self.spSession = None
         self.spChNewHandler = -1
         self.spChDestroyHandler = -1
         self.spChDisplay = None
 
-        self.state = FvpVmViewer.STATE_NONE
+        self.state = FvpViewRun.STATE_NONE
         self.destroyHandler = -1
         self.display = None
 
@@ -35,7 +35,7 @@ class FvpVmViewer(Gtk.HBox):
         self.add(self.noneDisplay)
 
     def connectVm(self, spicePort):
-        assert self.state == FvpVmViewer.STATE_NONE
+        assert self.state == FvpViewRun.STATE_NONE
 
         self.destroyHandler = self.connect("destroy", self.on_destroy)
         self._createSpSession(spicePort)
@@ -74,7 +74,7 @@ class FvpVmViewer(Gtk.HBox):
         assert self.spSession is None
         assert self.spChNewHandler == -1
         assert self.spChDestroyHandler == -1
-        assert self.state == FvpVmViewer.STATE_NONE
+        assert self.state == FvpViewRun.STATE_NONE
 
         # session create
         sess = SpiceClientGLib.Session.new()
@@ -109,29 +109,29 @@ class FvpVmViewer(Gtk.HBox):
             self.spSession = None
 
     def _toStateNone(self):
-        if self.state == FvpVmViewer.STATE_CONNECTING:
-            self.state = FvpVmViewer.STATE_NONE
+        if self.state == FvpViewRun.STATE_CONNECTING:
+            self.state = FvpViewRun.STATE_NONE
             return
 
-        if self.state == FvpVmViewer.STATE_RUNNING:
+        if self.state == FvpViewRun.STATE_RUNNING:
             self.remove(self.display)
             self.add(self.noneDisplay)
             self.noneDisplay.show()
             self.display.destroy()
             self.display = None
-            self.state = FvpVmViewer.STATE_NONE
+            self.state = FvpViewRun.STATE_NONE
             return
 
     def _toStateConnecting(self):
-        assert self.state == FvpVmViewer.STATE_NONE
+        assert self.state == FvpViewRun.STATE_NONE
 
-        self.state = FvpVmViewer.STATE_CONNECTING
+        self.state = FvpViewRun.STATE_CONNECTING
 
     def _toStateRunning(self):
-        assert self.state == FvpVmViewer.STATE_CONNECTING
+        assert self.state == FvpViewRun.STATE_CONNECTING
 
         self.display = SpiceClientGtk.Display.new(self.spSession, self.spChDisplay.get_property("channel-id"))			# fixme: why needs ".new" ?
         self.remove(self.noneDisplay)
         self.add(self.display)
         self.display.show()
-        self.state = FvpVmViewer.STATE_RUNNING
+        self.state = FvpViewRun.STATE_RUNNING

@@ -8,7 +8,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from autodrawer import AutoDrawer
 from core.vm_object import FvpVmObject
-from fvp_view_run import FvpVmViewer
+from fvp_view_run import FvpViewRun
 
 
 class FvpWindow(Gtk.ApplicationWindow):
@@ -30,7 +30,7 @@ class FvpWindow(Gtk.ApplicationWindow):
         self.actionGroupVm = self.gtkBuilder.get_object("actiongroup-vm")
         self.actionViewFullscreen = self.gtkBuilder.get_object("action-view-fullscreen")
 
-        self.vmViewer = FvpVmViewer()
+        self.vmViewer = FvpViewRun()
         self.vmViewer.set_size_request(640, 480)
         self.vmVBox.add(self.vmViewer)
 
@@ -64,6 +64,7 @@ class FvpWindow(Gtk.ApplicationWindow):
         print("on_action_app_quit")
 
     def on_action_vm_new(self, data=None):
+        pass
 
     def on_action_vm_open(self, data=None):
         try:
@@ -110,7 +111,7 @@ class FvpWindow(Gtk.ApplicationWindow):
 
     def newVm(self):
         try:
-            if self.vmObj is not None and vmObj.get_property("state") == FvpVmObject.STATE_POWER_ON:
+            if self.vmObj is not None and self.vmObj.get_property("state") == FvpVmObject.STATE_POWER_ON:
                 raise Exception("Please power off the curret virtual machine")
 
             if self.vmObj is not None:
@@ -122,7 +123,7 @@ class FvpWindow(Gtk.ApplicationWindow):
 
     def openVm(self, vmDir):
         try:
-            if self.vmObj is not None and vmObj.get_property("state") == FvpVmObject.STATE_POWER_ON:
+            if self.vmObj is not None and self.vmObj.get_property("state") == FvpVmObject.STATE_POWER_ON:
                 raise Exception("Please power off the curret virtual machine")
 
             if self.vmObj is not None:
