@@ -62,6 +62,6 @@ class FvpApplication(Gtk.Application):
         pass
 
     def _createWindow(self):
-        self._main_win = FvpWindow(self, self.param)
+        self._main_win = FvpWindow(self.param, self)
         self.add_window(self._main_win)
         self._main_win.show_all()

@@ -35,6 +35,17 @@ class FvpPluginManager:
     def __init__(self, param):
         self.param = param
 
+    def getPluginList(self):
+        ret = []
+        for fn in os.listdir(os.path.join(self.param.libDir, "plugins")):
+            if not fn.startswith("vmb_plugin_") or not fn.endswith(".py"):
+                continue
+            fn = fn[:-3]
+            exec("import %s" % (fn))
+            plugin = eval("%s.LbVmbPlugin()" % (fn))
+            ret.append(plugin)
+        return ret
+
     def getPlugin(self, os_name):
         for fn in os.listdir(os.path.join(self.param.libDir, "plugins")):
             if not fn.startswith("vmb_plugin_") or not fn.endswith(".py"):

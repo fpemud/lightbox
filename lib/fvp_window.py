@@ -13,11 +13,11 @@ from fvp_view_run import FvpViewRun
 
 class FvpWindow(Gtk.ApplicationWindow):
 
-    def __init__(self, app, param):
+    def __init__(self, param, app):
         Gtk.Window.__init__(self, application=app)
 
-        self.application = app
         self.param = param
+        self.application = app
 
         self.gtkBuilder = Gtk.Builder()
         self.gtkBuilder.add_from_file(os.path.join(self.param.libDir, "fvp_window.ui"))
