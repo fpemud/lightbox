@@ -3,30 +3,16 @@
 
 import os
 import subprocess
-import threading
-from collections import OrderedDict
+import shutil
 
 
 class LbVmbPlugin:
 
     def __init__(self):
-        self.osDict = OrderedDict()
-
-        self.osDict["Fpemud's Windows.XP"] = (
-            "Microsoft.Windows.XP.Professional.X86",
-            "OS_MSWINXP_X86",
-        )
-
-        if self._getHostArch() == "x86_64":
-            self.osDict["Fpemud's Windows.7"] = (
-                "Microsoft.Windows.7.Ultimate.X86_64",
-                "OS_MSWIN7_AMD64",
-            )
-        else:
-            self.osDict["Fpemud's Windows.7"] = (
-                "Microsoft.Windows.7.Ultimate.X86",
-                "OS_MSWIN7_X86",
-            )
+        self.OS_CENTOS_6_X86 = "CentOS.6.X86"
+        self.OS_CENTOS_6_AMD64 = "CentOS.6.X86_64"
+        self.OS_CENTOS_7_X86 = "CentOS.7.X86"
+        self.OS_CENTOS_7_AMD64 = "CentOS.7.X86_64"
 
         self.proc = None
         self.errThread = None
@@ -34,65 +20,88 @@ class LbVmbPlugin:
         self.progress_callback = None
 
     def get_os_name_list(self):
-        return list(self.osDict.keys())
+        return [
+            self.OS_CENTOS_6_X86,
+            self.OS_CENTOS_6_AMD64,
+            self.OS_CENTOS_7_X86,
+            self.OS_CENTOS_7_AMD64,
+        ]
 
-    def os_get_type(self, os_name):
-        return self.osDict[os_name][1]
-
-    def os_create_setup_iso_async(self, tmp_dir, os_name, progress_callback):
+    def create_setup_iso_async(self, tmp_dir, os_name, progress_callback):
         assert self.proc is None and self.errThread is None and self.dest is None
-        self.dest = os.path.join(tmp_dir, "unattended.iso")
-        cmd = "/usr/bin/fpemud-umake --os \"%s\" --media image --dot-progress \"%s\"" % (self.osDict[os_name][0], self.dest)
-        self.proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        self.errThread = _ErrThread(self.proc)
-        self.errThread.start()
-        self.progress_callback = progress_callback
-        return self.proc.stdout
 
-    def os_create_setup_iso_cancel(self):
-        try:
-            self.proc.terminate()
-            self.proc.communicate()
-            self.errThread.join()
-        finally:
-            self.proc = None
-            self.errThread = None
-            self.dest = None
-            self.progress_callback = None
+        isoFile = self._getIsoFile(os_name)
+        if not os.path.exists(isoFile):
+            raise Exception("ISO file \"%s\" does not exist" % (isoFile))
 
-    def os_create_setup_iso_finish(self):
-        try:
-            self.proc.wait()
-            self.errThread.join()
-            if self.proc.returncode != 0:
-                raise Exception(self.errThread.errmsg)
-            return self.dest
-        finally:
-            self.proc = None
-            self.errThread = None
-            self.dest = None
-            self.progress_callback = None
+    def create_setup_iso_cancel(self):
+        assert False
 
-    def _getHostArch(self):
-        # Code copied from /usr/src/linux/Makefile
-        cmd = "/usr/bin/uname -m | /bin/sed -e s/i.86/i386/ -e s/sun4u/sparc64/" + \
-              "                             -e s/arm.*/arm/ -e s/sa110/arm/" + \
-              "                             -e s/s390x/s390/ -e s/parisc64/parisc/" + \
-              "                             -e s/ppc.*/powerpc/ -e s/mips.*/mips/" + \
-              "                             -e s/sh.*/sh/"
-        proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        out, err = proc.communicate()
-        if proc.returncode != 0:
-            raise Exception("Get host architecture failed, %s" % (err))
-        return out.replace("\n", "")
+    def create_setup_iso_finish(self):
+        assert False
+
+    def update_vm_config(self, os_name, vm_config):
+        vm_config.qemuVmType = "q35"
+        vm_config.cpuArch = "amd64"
+        vm_config.cpuNumber = 1
+        vm_config.memorySize = 1024                       # 1GB
+        vm_config.mainDiskInterface = "virtio-blk"
+        vm_config.graphicsAdapterInterface = "vga"
+        vm_config.graphicsAdapterPciSlot = 7
+        vm_config.soundAdapterInterface = "ac97"
+        vm_config.soundAdapterPciSlot = 6
+        vm_config.networkAdapterInterface = "virtio"
+        vm_config.networkAdapterPciSlot = 5
+        vm_config.balloonDeviceSupport = True
+        vm_config.balloonDevicePciSlot = 4
+        vm_config.vdiPortDeviceSupport = True
+        vm_config.vdiPortDevicePciSlot = 3
+
+    def get_main_disk_size(self, os_name):
+        return 10000                                        # 10GB
+
+    def _getIsoFile(self, os_name):
+        if os_name == self.OS_CENTOS_6_X86:
+            assert False
+        elif os_name == self.OS_CENTOS_6_AMD64:
+            assert False
+        elif os_name == self.OS_CENTOS_7_X86:
+            assert False
+        elif os_name == self.OS_CENTOS_7_AMD64:
+            return "/usr/share/centos-7-setup-dvd/centos-7-dvd-amd64.iso"
+        else:
+            assert False
+
+    def _createNewIso(self, tmp_dir, os_name, iso_file):
+        dest = os.path.join(tmp_dir, "unattended.iso")
+        isoDir = os.path.join(tmp_dir, "iso")
+
+        print(">> Extracting \"%s\"" % (iso_file))
+        if True:
+            cmd = "/usr/bin/7z x \"%s\" -o\"%s\"" % (iso_file, isoDir)
+            proc = subprocess.Popen(cmd, shell=True)
+            proc.wait()
+
+        print(">> Generating Kickstart file")
+        if True:
+            with open(os.path.join(isoDir, "ks.cfg"), "w") as f:
+                f.write("")
+
+            cmd = "/bin/sed -i \"s/append initrd=initrd.img/append initrd=initrd.img ks=cdrom:\/ks.cfg/g\" \"%s\"" % (os.path.join(isoDir, "isolinux/isolinux.cfg"))
+            proc = subprocess.Popen(cmd, shell=True)
+            proc.wait()
+
+        print(">> Creating \"unattended.iso\"")
+        if True:
+            cmd = "/usr/bin/genisoimage -U -r -v -T -J -joliet-long -V \"RHEL-7\"" + \
+                  " -volset \"RHEL-7\" -A \"RHEL-7\" -b isolinux/isolinux.bin -c isolinux/boot.cat" + \
+                  " -no-emul-boot -boot-load-size 4 -boot-info-table -eltorito-alt-boot -e images/efiboot.img" + \
+                  " -no-emul-boot -o \"%s\" \"%s\"" % (dest, isoDir)
+            proc = subprocess.Popen(cmd, shell=True)
+            proc.wait()
+
+            # fixme
+            shutil.rmtree(isoDir)
 
 
-class _ErrThread(threading.Thread):
-
-    def __init__(self, proc):
-        super(_ErrThread, self).__init__()
-        self.proc = proc
-        self.errmsg = None
-
-    def run(self):
-        self.errmsg = self.proc.stderr.read().decode("utf-8")
+# genisoimage -U -r -v -T -J -joliet-long -V "RHEL-6" -volset "RHEL-6" -A "RHEL-6" -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -eltorito-alt-boot -e images/efiboot.img -no-emul-boot -o ../NEWISO.iso .

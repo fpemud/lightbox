@@ -1,17 +1,23 @@
 #!/usr/bin/python3
 # -*- coding: utf-8; tab-width: 4; indent-tabs-mode: t -*-
 
-class LbVmrPlugin:
 
-    def get_os_type_list(self):
+class LbVmbPlugin:
+
+    def __init__(self):
+        self.OS_MSWINXP_X86 = "Microsoft.Windows.XP.Professional.X86"
+        self.OS_MSWIN7_X86 = "Microsoft.Windows.7.Ultimate.X86"
+        self.OS_MSWIN7_AMD64 = "Microsoft.Windows.7.Ultimate.X86_64"
+
+    def get_os_name_list(self):
         return [
-            "MSWINXP_X86",
-            "MSWIN7_X86",
-            "MSWIN7_AMD64",
+            self.OS_MSWINXP_X86,
+            self.OS_MSWIN7_X86,
+            self.OS_MSWIN7_AMD64,
         ]
 
-    def update_vm_config(self, os_type, vm_config):
-        if os_type == "MSWINXP_X86":
+    def update_vm_config(self, os_name, vm_config):
+        if os_name == self.OS_MSWINXP_X86:
             vm_config.qemuVmType = "pc"
             vm_config.cpuArch = "x86"
             vm_config.cpuNumber = 1
@@ -27,7 +33,7 @@ class LbVmrPlugin:
             vm_config.balloonDevicePciSlot = 4
             vm_config.vdiPortDeviceSupport = True
             vm_config.vdiPortDevicePciSlot = 3
-        elif os_type == "MSWIN7_X86":
+        elif os_name == self.OS_MSWIN7_X86:
             vm_config.qemuVmType = "q35"
             vm_config.cpuArch = "x86"
             vm_config.cpuNumber = 1
@@ -43,7 +49,7 @@ class LbVmrPlugin:
             vm_config.balloonDevicePciSlot = 4
             vm_config.vdiPortDeviceSupport = True
             vm_config.vdiPortDevicePciSlot = 3
-        elif os_type == "MSWIN7_AMD64":
+        elif os_name == self.OS_MSWIN7_AMD64:
             vm_config.qemuVmType = "q35"
             vm_config.cpuArch = "amd64"
             vm_config.cpuNumber = 1
@@ -62,12 +68,12 @@ class LbVmrPlugin:
         else:
             assert False
 
-    def get_main_disk_size(self, os_type):
-        if os_type == "MSWINXP_X86":
+    def get_main_disk_size(self, os_name):
+        if os_name == self.OS_MSWINXP_X86:
             return 10000                                    # 10GB
-        elif os_type == "MSWIN7_X86":
+        elif os_name == self.OS_MSWIN7_X86:
             return 20000                                    # 20GB
-        elif os_type == "MSWIN7_AMD64":
+        elif os_name == self.OS_MSWIN7_AMD64:
             return 20000                                    # 20GB
         else:
             assert False

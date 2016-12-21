@@ -36,10 +36,7 @@ class LbVmbPlugin:
     def get_os_name_list(self):
         return list(self.osDict.keys())
 
-    def os_get_type(self, os_name):
-        return self.osDict[os_name][1]
-
-    def os_create_setup_iso_async(self, tmp_dir, os_name, progress_callback):
+    def create_setup_iso_async(self, tmp_dir, os_name, progress_callback):
         assert self.proc is None and self.errThread is None and self.dest is None
         self.dest = os.path.join(tmp_dir, "unattended.iso")
         cmd = "/usr/bin/fpemud-umake --os \"%s\" --media image --dot-progress \"%s\"" % (self.osDict[os_name][0], self.dest)
@@ -49,7 +46,7 @@ class LbVmbPlugin:
         self.progress_callback = progress_callback
         return self.proc.stdout
 
-    def os_create_setup_iso_cancel(self):
+    def create_setup_iso_cancel(self):
         try:
             self.proc.terminate()
             self.proc.communicate()
@@ -60,7 +57,7 @@ class LbVmbPlugin:
             self.dest = None
             self.progress_callback = None
 
-    def os_create_setup_iso_finish(self):
+    def create_setup_iso_finish(self):
         try:
             self.proc.wait()
             self.errThread.join()

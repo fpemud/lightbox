@@ -114,6 +114,20 @@
               <object class="GtkMenu" id="vm-menu">
                 <property name="can_focus">False</property>
                 <child>
+                  <object class="GtkMenuItem" id="vm-new">
+                    <property name="related_action">action-vm-new</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="use_underline">True</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkSeparatorMenuItem" id="separator11">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                  </object>
+                </child>
+                <child>
                   <object class="GtkMenuItem" id="vm-power">
                     <property name="related_action">action-vm-power</property>
                     <property name="visible">True</property>
@@ -130,7 +144,7 @@
                   </object>
                 </child>
                 <child>
-                  <object class="GtkSeparatorMenuItem" id="separator11">
+                  <object class="GtkSeparatorMenuItem" id="separator12">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                   </object>
