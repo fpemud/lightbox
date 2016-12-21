@@ -71,7 +71,7 @@ class _BuildThread(threading.Thread):
                 cfg.write(f)
         if True:
             cfg = ConfigParser.SafeConfigParser()
-            cfg.set("main", "os_type", os_type))
+            cfg.set("main", "os_type", os_type)
             with open(os.path.join(self.dstdir, "lightbox.ini"), "w") as f:
                 cfg.write(f)
             
