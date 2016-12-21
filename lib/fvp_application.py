@@ -3,6 +3,8 @@
 
 import tempfile
 import shutil
+import gi
+gi.require_version('Gtk', '3.0')
 from gi.repository import GLib
 from gi.repository import Gio
 from gi.repository import Gtk

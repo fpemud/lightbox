@@ -27,7 +27,7 @@ class FvpVmbPlugin:
         pass
 
 
-class FvpVmPluginManager:
+class FvpPluginManager:
 
     def __init__(self, param):
         self.param = param

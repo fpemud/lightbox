@@ -13,7 +13,7 @@ import configparser
 import qmp
 from gi.repository import GObject
 from gi.repository import GLib
-from fvp_util import FvpUtil
+from core.util import FvpUtil
 
 
 class FvpVmConfig:

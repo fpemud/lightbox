@@ -3,8 +3,8 @@
 
 import os
 import configparser
-from fvp_util import FvpUtil
-from fvp_peripheral import FvpPeripheral
+from core.util import FvpUtil
+from core.peripheral import FvpPeripheral
 
 
 class FvpVmEnvironment:

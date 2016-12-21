@@ -3,6 +3,8 @@
 
 import os
 import traceback
+import gi
+gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from autodrawer import AutoDrawer
 from core.vm_object import FvpVmObject

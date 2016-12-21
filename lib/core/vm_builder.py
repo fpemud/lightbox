@@ -4,7 +4,7 @@
 import os
 import threading
 import configparser
-from fvp_util import FvpUtil
+from core.util import FvpUtil
 
 
 class FvpVmBuilder:
