@@ -21,8 +21,7 @@ class FvpViewCreate(Gtk.HBox):
 
         for plugin in self.param.pluginManager.getPluginList():
             for os_name in plugin.get_os_name_list():
-
-
+                assert False
 
         self.noneDisplay = Gtk.EventBox()
         self.noneDisplay.modify_bg(Gtk.StateType.NORMAL, Gdk.Color(0, 0, 0))

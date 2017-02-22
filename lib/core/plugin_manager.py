@@ -41,7 +41,7 @@ class FvpPluginManager:
             if not fn.startswith("vmb_plugin_") or not fn.endswith(".py"):
                 continue
             fn = fn[:-3]
-            exec("import %s" % (fn))
+            exec("from plugins import %s" % (fn))
             plugin = eval("%s.LbVmbPlugin()" % (fn))
             ret.append(plugin)
         return ret
@@ -51,7 +51,7 @@ class FvpPluginManager:
             if not fn.startswith("vmb_plugin_") or not fn.endswith(".py"):
                 continue
             fn = fn[:-3]
-            exec("import %s" % (fn))
+            exec("from plugins import %s" % (fn))
             plugin = eval("%s.LbVmbPlugin()" % (fn))
             if os_name in plugin.get_os_name_list():
                 return plugin
